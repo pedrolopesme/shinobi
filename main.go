@@ -1,7 +1,19 @@
 package main
 
-import "fmt"
+import (
+	"github.com/pedrolopesme/shinobi/cmd"
+	"github.com/pedrolopesme/shinobi/internal/domain"
+	"go.uber.org/zap"
+)
 
 func main() {
-	fmt.Println("Silence is gold...")
+	application := domain.Application{
+		AlphaVantageAPIKey: "INSERT YOU KEY HERE",
+	}
+
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
+	shinobi := cmd.NewShinobi(application, *logger)
+	shinobi.Run()
 }
