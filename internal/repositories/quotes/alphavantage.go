@@ -1,7 +1,6 @@
 package quotes
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,21 +14,20 @@ import (
 )
 
 type AlphaVantageQuoteRepository struct {
-	ctx context.Context
+	application domain.Application
 }
 
-func NewAlphaVantageQuoteRepository(ctx context.Context) AlphaVantageQuoteRepository {
+func NewAlphaVantageQuoteRepository(application domain.Application) AlphaVantageQuoteRepository {
 	return AlphaVantageQuoteRepository{
-		ctx: ctx,
+		application: application,
 	}
 }
 
 func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, error) {
-	app := a.ctx.Value(domain.CTX_APP).(domain.Application)
-	logger := a.ctx.Value(domain.CTX_LOGGER).(zap.Logger)
+	logger := a.application.Logger()
 	logger.Info("Retrieving Quotes from AlphaVantage API")
 
-	endpoint := fmt.Sprintf("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&apikey=%s", symbol, app.AlphaVantageAPIKey)
+	endpoint := fmt.Sprintf("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&apikey=%s", symbol, a.application.AlphaVantageKey())
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		return nil, err

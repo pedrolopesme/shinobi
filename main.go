@@ -7,13 +7,13 @@ import (
 )
 
 func main() {
-	application := domain.Application{
-		AlphaVantageAPIKey: "VIV654H7KZ7VHL5V",
-	}
-
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
-	shinobi := cmd.NewShinobi(application, *logger)
-	shinobi.Run()
+	application := domain.NewApplication(
+		"VIV654H7KZ7VHL5V",
+		*logger,
+	)
+
+	cmd.NewShinobi(*application).Run()
 }
