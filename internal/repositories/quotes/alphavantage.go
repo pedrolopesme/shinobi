@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"go.uber.org/zap"
@@ -45,8 +46,12 @@ func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, e
 
 	rawTimeSeries := rawResult["Time Series (Daily)"].(map[string]interface{})
 	for index := range rawTimeSeries {
-		rawDataPoint := rawTimeSeries[index].(map[string]interface{})
+		date, err := time.Parse("2006-01-02", index)
+		if err != nil {
+			logger.Error("Impossible to parse date", zap.String("date", index), zap.Error(err))
+		}
 
+		rawDataPoint := rawTimeSeries[index].(map[string]interface{})
 		open, _ := strconv.ParseFloat(rawDataPoint["1. open"].(string), 32)
 		high, _ := strconv.ParseFloat(rawDataPoint["2. high"].(string), 32)
 		low, _ := strconv.ParseFloat(rawDataPoint["3. low"].(string), 32)
@@ -54,6 +59,7 @@ func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, e
 		volume, _ := strconv.Atoi(rawDataPoint["5. volume"].(string))
 
 		quote := domain.Quote{
+			Date:   date,
 			Open:   float32(open),
 			High:   float32(high),
 			Low:    float32(low),
@@ -61,7 +67,7 @@ func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, e
 			Volume: int32(volume),
 		}
 
-		fmt.Println(quote)
+		quotes = append(quotes, quote)
 	}
 
 	return quotes, nil

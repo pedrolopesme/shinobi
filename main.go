@@ -8,7 +8,7 @@ import (
 
 func main() {
 	application := domain.Application{
-		AlphaVantageAPIKey: "INSERT YOU KEY HERE",
+		AlphaVantageAPIKey: "VIV654H7KZ7VHL5V",
 	}
 
 	logger, _ := zap.NewProduction()
