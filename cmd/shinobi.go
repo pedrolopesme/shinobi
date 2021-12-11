@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"github.com/pedrolopesme/shinobi/internal/repositories/quotes"
 	"github.com/pedrolopesme/shinobi/internal/services"
@@ -24,5 +26,11 @@ func (s Shinobi) Run() {
 	quotesService := services.NewAlphaVantageQuoteService(s.application, quotesRepo)
 
 	logger.Info("Getting quotes")
-	quotesService.GetQuotes(symbol)
+	today := 0 // TODO today
+	yesterday, _ := quotesService.GetMovingAveragePeriod(symbol, 1)
+	lastWeek, _ := quotesService.GetMovingAveragePeriod(symbol, 5)
+	lastMonth, _ := quotesService.GetMovingAveragePeriod(symbol, 20)
+	lastQuarter, _ := quotesService.GetMovingAveragePeriod(symbol, 60)
+	last200Days, _ := quotesService.GetMovingAveragePeriod(symbol, 200)
+	fmt.Println(symbol, "today ", today, "yesterday", yesterday, "lastWeek", lastWeek, "lastMonth", lastMonth, "lastQuarter", lastQuarter, "last200Days", last200Days)
 }

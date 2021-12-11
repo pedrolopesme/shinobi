@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -67,6 +68,12 @@ func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, e
 
 		quotes = append(quotes, quote)
 	}
+
+	// unfortunnately, I have to loop through the quotes twice
+	// since all have to sort it by date
+	sort.Slice(quotes, func(i, j int) bool {
+		return quotes[i].Date.After(quotes[j].Date)
+	})
 
 	return quotes, nil
 }
