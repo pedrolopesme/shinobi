@@ -11,7 +11,7 @@ func main() {
 	defer logger.Sync()
 
 	application := domain.NewApplication(
-		"INSERT YOU KEY HERE",
+		"VIV654H7KZ7VHL5V",
 		*logger,
 	)
 

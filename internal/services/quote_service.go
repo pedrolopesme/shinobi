@@ -36,15 +36,7 @@ func (s AlphaVantageQuoteService) GetQuotes(symbol string) ([]domain.Quote, erro
 	return quotes, nil
 }
 
-// TODO add some cache to avoid call the same symbol multiple times
-func (a AlphaVantageQuoteService) GetMovingAveragePeriod(symbol string, period int) (float32, error) {
-	logger := a.application.Logger()
-	quotes, err := a.GetQuotes(symbol)
-	if err != nil {
-		logger.Error("impossible to calculate moving average", zap.String("symbol", symbol), zap.Error(err))
-		return 0, err
-	}
-
+func (a AlphaVantageQuoteService) GetMovingAveragePeriod(quotes []domain.Quote, period int) (float32, error) {
 	// calculating the simple moving average for the selected period
 	result := float32(0)
 	period = int(math.Min(float64(period), float64(len(quotes)))) // :-(

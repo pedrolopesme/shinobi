@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"github.com/pedrolopesme/shinobi/internal/repositories/quotes"
 	"github.com/pedrolopesme/shinobi/internal/services"
+	"go.uber.org/zap"
 )
 
 type Shinobi struct {
@@ -17,6 +19,7 @@ func NewShinobi(application domain.Application) Shinobi {
 }
 
 func (s Shinobi) Run() {
+
 	logger := s.application.Logger()
 
 	symbol := "MGLU3.SA"
@@ -26,11 +29,17 @@ func (s Shinobi) Run() {
 	quotesService := services.NewAlphaVantageQuoteService(s.application, quotesRepo)
 
 	logger.Info("Getting quotes")
+	quotes, err := quotesService.GetQuotes(symbol)
+	if err != nil {
+		logger.Error("impossible to calculate moving average", zap.String("symbol", symbol), zap.Error(err))
+		os.Exit(1)
+	}
+
 	today := 0 // TODO today
-	yesterday, _ := quotesService.GetMovingAveragePeriod(symbol, 1)
-	lastWeek, _ := quotesService.GetMovingAveragePeriod(symbol, 5)
-	lastMonth, _ := quotesService.GetMovingAveragePeriod(symbol, 20)
-	lastQuarter, _ := quotesService.GetMovingAveragePeriod(symbol, 60)
-	last200Days, _ := quotesService.GetMovingAveragePeriod(symbol, 200)
+	yesterday, _ := quotesService.GetMovingAveragePeriod(quotes, 1)
+	lastWeek, _ := quotesService.GetMovingAveragePeriod(quotes, 5)
+	lastMonth, _ := quotesService.GetMovingAveragePeriod(quotes, 20)
+	lastQuarter, _ := quotesService.GetMovingAveragePeriod(quotes, 60)
+	last200Days, _ := quotesService.GetMovingAveragePeriod(quotes, 200)
 	fmt.Println(symbol, "today ", today, "yesterday", yesterday, "lastWeek", lastWeek, "lastMonth", lastMonth, "lastQuarter", lastQuarter, "last200Days", last200Days)
 }
