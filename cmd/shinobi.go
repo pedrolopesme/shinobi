@@ -5,33 +5,38 @@ import (
 	"os"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
+	"github.com/pedrolopesme/shinobi/internal/domain/application"
 	"github.com/pedrolopesme/shinobi/internal/repositories/quotes"
 	"github.com/pedrolopesme/shinobi/internal/services"
 	"go.uber.org/zap"
 )
 
 type Shinobi struct {
-	application domain.Application
+	application application.Application
 }
 
-func NewShinobi(application domain.Application) Shinobi {
+func NewShinobi(application application.Application) Shinobi {
 	return Shinobi{application: application}
 }
 
-func (s Shinobi) Run() {
+func (s Shinobi) Sync() {
+	stocks := s.application.Stocks()
+	for i := range stocks {
+		s.syncStock(stocks[i])
+	}
+}
 
+func (s Shinobi) syncStock(stock domain.Stock) {
 	logger := s.application.Logger()
-
-	symbol := "MGLU3.SA"
-	logger.Info("Running Shinobi on " + symbol)
+	logger.Info("Running Shinobi on " + stock.Symbol)
 
 	quotesRepo := quotes.NewAlphaVantageQuoteRepository(s.application)
 	quotesService := services.NewAlphaVantageQuoteService(s.application, quotesRepo)
 
 	logger.Info("Getting quotes")
-	quotes, err := quotesService.GetQuotes(symbol)
+	quotes, err := quotesService.GetQuotes(stock.Symbol)
 	if err != nil {
-		logger.Error("impossible to calculate moving average", zap.String("symbol", symbol), zap.Error(err))
+		logger.Error("impossible to calculate moving average", zap.String("symbol", stock.Symbol), zap.Error(err))
 		os.Exit(1)
 	}
 
@@ -41,5 +46,6 @@ func (s Shinobi) Run() {
 	lastMonth, _ := quotesService.GetMovingAveragePeriod(quotes, 20)
 	lastQuarter, _ := quotesService.GetMovingAveragePeriod(quotes, 60)
 	last200Days, _ := quotesService.GetMovingAveragePeriod(quotes, 200)
-	fmt.Println(symbol, "today ", today, "yesterday", yesterday, "lastWeek", lastWeek, "lastMonth", lastMonth, "lastQuarter", lastQuarter, "last200Days", last200Days)
+
+	fmt.Println(stock.Symbol, "today ", today, "yesterday", yesterday, "lastWeek", lastWeek, "lastMonth", lastMonth, "lastQuarter", lastQuarter, "last200Days", last200Days)
 }

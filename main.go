@@ -11,7 +11,7 @@ func main() {
 	defer logger.Sync()
 
 	application := domain.NewApplication(
-		"VIV654H7KZ7VHL5V",
+		"./config/sample.json",
 		*logger,
 	)
 
