@@ -29,7 +29,7 @@ func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, e
 	logger := a.application.Logger()
 	logger.Info("Retrieving Quotes from AlphaVantage API")
 
-	endpoint := fmt.Sprintf("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&apikey=%s", symbol, a.application.AlphaVantageKey())
+	endpoint := fmt.Sprintf("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&outputsize=full&apikey=%s", symbol, a.application.AlphaVantageKey())
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		return nil, err
