@@ -4,17 +4,18 @@ import (
 	"math"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
+	"github.com/pedrolopesme/shinobi/internal/domain/application"
 	"github.com/pedrolopesme/shinobi/internal/ports"
 	"github.com/pedrolopesme/shinobi/internal/utils"
 	"go.uber.org/zap"
 )
 
 type AlphaVantageQuoteService struct {
-	application domain.Application
+	application application.Application
 	repositoy   ports.QuotesRepositoryContract
 }
 
-func NewAlphaVantageQuoteService(application domain.Application, repo ports.QuotesRepositoryContract) AlphaVantageQuoteService {
+func NewAlphaVantageQuoteService(application application.Application, repo ports.QuotesRepositoryContract) AlphaVantageQuoteService {
 	return AlphaVantageQuoteService{
 		application: application,
 		repositoy:   repo,

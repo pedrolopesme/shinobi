@@ -11,14 +11,15 @@ import (
 	"time"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
+	"github.com/pedrolopesme/shinobi/internal/domain/application"
 	"go.uber.org/zap"
 )
 
 type AlphaVantageQuoteRepository struct {
-	application domain.Application
+	application application.Application
 }
 
-func NewAlphaVantageQuoteRepository(application domain.Application) AlphaVantageQuoteRepository {
+func NewAlphaVantageQuoteRepository(application application.Application) AlphaVantageQuoteRepository {
 	return AlphaVantageQuoteRepository{
 		application: application,
 	}
