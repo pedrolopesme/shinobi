@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"github.com/pedrolopesme/shinobi/internal/domain/application"
@@ -20,10 +21,26 @@ func NewShinobi(application application.Application) Shinobi {
 }
 
 func (s Shinobi) Sync() {
+	logger := s.application.Logger()
 	stocks := s.application.Stocks()
+
+	logger.Info(fmt.Sprint("Synching ", len(stocks), " stocks"))
+
+	var wg sync.WaitGroup
+	wg.Add(len(stocks))
+
 	for i := range stocks {
-		s.syncStock(stocks[i])
+		go func(i int) {
+			stock := stocks[i]
+			logger.Info("Synching stock " + stock.Symbol)
+			s.syncStock(stock)
+			wg.Done()
+		}(i)
 	}
+
+	wg.Wait()
+	logger.Info("Stocks synchonized")
+
 }
 
 func (s Shinobi) syncStock(stock domain.Stock) {
@@ -40,12 +57,11 @@ func (s Shinobi) syncStock(stock domain.Stock) {
 		os.Exit(1)
 	}
 
-	today := 0 // TODO today
-	yesterday, _ := quotesService.GetMovingAveragePeriod(quotes, 1)
+	yesterday := quotes[0].Close
 	lastWeek, _ := quotesService.GetMovingAveragePeriod(quotes, 5)
 	lastMonth, _ := quotesService.GetMovingAveragePeriod(quotes, 20)
 	lastQuarter, _ := quotesService.GetMovingAveragePeriod(quotes, 60)
 	last200Days, _ := quotesService.GetMovingAveragePeriod(quotes, 200)
 
-	fmt.Println(stock.Symbol, "today ", today, "yesterday", yesterday, "lastWeek", lastWeek, "lastMonth", lastMonth, "lastQuarter", lastQuarter, "last200Days", last200Days)
+	fmt.Println(stock.Symbol, "yesterday", yesterday, "lastWeek", lastWeek, "lastMonth", lastMonth, "lastQuarter", lastQuarter, "last200Days", last200Days)
 }
