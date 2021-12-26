@@ -64,3 +64,11 @@ func (a Application) AlphaVantageKey() string {
 func (a Application) Stocks() []domain.Stock {
 	return a.config.Stocks
 }
+
+func (a Application) Periods() []int {
+	return a.config.Report.Periods
+}
+
+func (a Application) ReportPath() string {
+	return a.config.Report.Path
+}

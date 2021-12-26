@@ -49,6 +49,7 @@ func (s Shinobi) syncStock(stock domain.Stock) {
 
 	quotesRepo := quotes.NewAlphaVantageQuoteRepository(s.application)
 	quotesService := services.NewAlphaVantageQuoteService(s.application, quotesRepo)
+	reportService := services.NewReportService(s.application)
 
 	logger.Info("Getting quotes")
 	quotes, err := quotesService.GetQuotes(stock.Symbol)
@@ -57,11 +58,12 @@ func (s Shinobi) syncStock(stock domain.Stock) {
 		os.Exit(1)
 	}
 
-	yesterday := quotes[0].Close
-	lastWeek, _ := quotesService.GetMovingAveragePeriod(quotes, 5)
-	lastMonth, _ := quotesService.GetMovingAveragePeriod(quotes, 20)
-	lastQuarter, _ := quotesService.GetMovingAveragePeriod(quotes, 60)
-	last200Days, _ := quotesService.GetMovingAveragePeriod(quotes, 200)
+	report, err := reportService.GenerateReport(stock, quotes)
+	if err != nil {
+		logger.Error("Impossible to generate report", zap.String("symbol", stock.Symbol), zap.Error(err))
+	}
 
-	fmt.Println(stock.Symbol, "yesterday", yesterday, "lastWeek", lastWeek, "lastMonth", lastMonth, "lastQuarter", lastQuarter, "last200Days", last200Days)
+	if err := reportService.SaveReport(*report); err != nil {
+		logger.Error("Impossible to generate report", zap.String("symbol", stock.Symbol), zap.Error(err))
+	}
 }

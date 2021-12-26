@@ -2,11 +2,14 @@
     "alphavantage": {
         "api_key": "INSERT YOUR KEY HERE"
     },
-    "databse": {
-        "dsn": "./database/shinobi.db" 
-    },
     "stocks" : [
         {"symbol" : "MGLU3.SA"},
         {"symbol" : "WEGE3.SA"}
-    ]
+    ],
+    "report": {
+        "path" : "./reports",
+        "periods": [
+            1, 5, 20, 60, 200
+        ]
+    }
 }

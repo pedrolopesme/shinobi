@@ -1,12 +1,9 @@
 package services
 
 import (
-	"math"
-
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"github.com/pedrolopesme/shinobi/internal/domain/application"
 	"github.com/pedrolopesme/shinobi/internal/ports"
-	"github.com/pedrolopesme/shinobi/internal/utils"
 	"go.uber.org/zap"
 )
 
@@ -35,17 +32,4 @@ func (s AlphaVantageQuoteService) GetQuotes(symbol string) ([]domain.Quote, erro
 	}
 
 	return quotes, nil
-}
-
-func (a AlphaVantageQuoteService) GetMovingAveragePeriod(quotes []domain.Quote, period int) (float32, error) {
-	// calculating the simple moving average for the selected period
-	result := float32(0)
-	period = int(math.Min(float64(period), float64(len(quotes)))) // :-(
-
-	for i := 0; i < period; i++ {
-		result += quotes[i].Close
-	}
-
-	result /= float32(period)
-	return utils.RoundMoney(result)
 }
