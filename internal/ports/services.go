@@ -7,6 +7,6 @@ type QuoteContract interface {
 }
 
 type ReportServiceContract interface {
-	GenerateReport(stock domain.Stock, quotes []domain.Quote) (*domain.Report, error)
+	GenerateReportStock(stock domain.Stock, quotes []domain.Quote) (*domain.ReportStock, error)
 	SaveReport(report domain.Report) error
 }

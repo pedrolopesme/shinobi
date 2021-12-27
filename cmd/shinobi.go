@@ -13,16 +13,21 @@ import (
 )
 
 type Shinobi struct {
-	application application.Application
+	application   application.Application
+	reportService *services.ReportService
 }
 
 func NewShinobi(application application.Application) Shinobi {
-	return Shinobi{application: application}
+	return Shinobi{
+		application:   application,
+		reportService: services.NewReportService(application),
+	}
 }
 
 func (s Shinobi) Sync() {
 	logger := s.application.Logger()
 	stocks := s.application.Stocks()
+	report := domain.Report{}
 
 	logger.Info(fmt.Sprint("Synching ", len(stocks), " stocks"))
 
@@ -33,7 +38,9 @@ func (s Shinobi) Sync() {
 		go func(i int) {
 			stock := stocks[i]
 			logger.Info("Synching stock " + stock.Symbol)
-			s.syncStock(stock)
+			if reportStock := s.syncStock(stock); reportStock != nil {
+				report.AddStock(*reportStock)
+			}
 			wg.Done()
 		}(i)
 	}
@@ -41,15 +48,17 @@ func (s Shinobi) Sync() {
 	wg.Wait()
 	logger.Info("Stocks synchonized")
 
+	if err := s.reportService.SaveReport(report); err != nil {
+		logger.Error("Impossible to generate report", zap.Error(err))
+	}
 }
 
-func (s Shinobi) syncStock(stock domain.Stock) {
+func (s Shinobi) syncStock(stock domain.Stock) *domain.ReportStock {
 	logger := s.application.Logger()
 	logger.Info("Running Shinobi on " + stock.Symbol)
 
 	quotesRepo := quotes.NewAlphaVantageQuoteRepository(s.application)
 	quotesService := services.NewAlphaVantageQuoteService(s.application, quotesRepo)
-	reportService := services.NewReportService(s.application)
 
 	logger.Info("Getting quotes")
 	quotes, err := quotesService.GetQuotes(stock.Symbol)
@@ -58,12 +67,10 @@ func (s Shinobi) syncStock(stock domain.Stock) {
 		os.Exit(1)
 	}
 
-	report, err := reportService.GenerateReport(stock, quotes)
+	report, err := s.reportService.GenerateReportStock(stock, quotes)
 	if err != nil {
 		logger.Error("Impossible to generate report", zap.String("symbol", stock.Symbol), zap.Error(err))
 	}
 
-	if err := reportService.SaveReport(*report); err != nil {
-		logger.Error("Impossible to generate report", zap.String("symbol", stock.Symbol), zap.Error(err))
-	}
+	return report
 }

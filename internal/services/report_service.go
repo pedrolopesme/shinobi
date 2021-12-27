@@ -21,11 +21,11 @@ func NewReportService(app application.Application) *ReportService {
 	}
 }
 
-func (r ReportService) GenerateReport(stock domain.Stock, quotes []domain.Quote) (*domain.Report, error) {
+func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Quote) (*domain.ReportStock, error) {
 	logger := r.application.Logger()
 	periods := r.application.Periods()
 
-	report := domain.Report{
+	report := domain.ReportStock{
 		Stock:   stock,
 		Periods: make([]domain.Period, 0),
 	}
@@ -55,11 +55,14 @@ func (r ReportService) SaveReport(report domain.Report) error {
 	fileContent = fileContent[:len(fileContent)-1] + "\n"
 
 	// preparing content
-	fileContent += report.Stock.Symbol
-	for i := range report.Periods {
-		fileContent += fmt.Sprintf("%f;", report.Periods[i].Value)
+	for i := range report.Stocks {
+		reportStock := report.Stocks[i]
+		fileContent += fmt.Sprintf("%s;", reportStock.Stock.Symbol)
+		for i := range reportStock.Periods {
+			fileContent += fmt.Sprintf("%f;", reportStock.Periods[i].Value)
+		}
+		fileContent = fileContent[:len(fileContent)-1] + "\n"
 	}
-	fileContent = fileContent[:len(fileContent)-1] + "\n"
 
 	// writing file
 	now := time.Now()

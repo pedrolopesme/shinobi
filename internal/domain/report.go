@@ -1,11 +1,23 @@
 package domain
 
 type Period struct {
-	Name  int     `json:"name"`
-	Value float32 `json:"value"`
+	Name  int
+	Value float32
+}
+
+type ReportStock struct {
+	Stock   Stock
+	Periods []Period
 }
 
 type Report struct {
-	Stock   Stock    `json:"stock"`
-	Periods []Period `json:"period"`
+	Stocks []ReportStock
+}
+
+func (r *Report) AddStock(reportStock ReportStock) {
+	if r.Stocks == nil {
+		r.Stocks = make([]ReportStock, 0)
+	}
+
+	r.Stocks = append(r.Stocks, reportStock)
 }
