@@ -27,7 +27,13 @@ func NewAlphaVantageQuoteRepository(application application.Application) AlphaVa
 
 func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, error) {
 	logger := a.application.Logger()
-	logger.Info("Retrieving Quotes from AlphaVantage API")
+	logger.Info("Retrieving Quotes from AlphaVantage API", zap.String("symbol", symbol))
+
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error("Impossible to get quotes", zap.String("symbol", symbol))
+		}
+	}()
 
 	endpoint := fmt.Sprintf("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&outputsize=full&apikey=%s", symbol, a.application.AlphaVantageKey())
 	resp, err := http.Get(endpoint)
@@ -35,20 +41,21 @@ func (a AlphaVantageQuoteRepository) GetQuotes(symbol string) ([]domain.Quote, e
 		return nil, err
 	}
 
-	logger.Info("Parsing Data Points")
+	logger.Info("Parsing Data Points", zap.String("symbol", symbol))
 	quotes := make([]domain.Quote, 0)
 
 	buffer := new(strings.Builder)
 	io.Copy(buffer, resp.Body)
+	responseBody := buffer.String()
 
 	var rawResult map[string]interface{}
-	json.Unmarshal([]byte(buffer.String()), &rawResult)
+	json.Unmarshal([]byte(responseBody), &rawResult)
 
 	rawTimeSeries := rawResult["Time Series (Daily)"].(map[string]interface{})
 	for index := range rawTimeSeries {
 		date, err := time.Parse("2006-01-02", index)
 		if err != nil {
-			logger.Error("Impossible to parse date", zap.String("date", index), zap.Error(err))
+			logger.Error("Impossible to parse date", zap.String("date", index), zap.Error(err), zap.String("symbol", symbol))
 		}
 
 		rawDataPoint := rawTimeSeries[index].(map[string]interface{})

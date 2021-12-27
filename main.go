@@ -20,5 +20,5 @@ func main() {
 		*logger,
 	)
 
-	cmd.NewShinobi(*application).Sync()
+	cmd.NewShinobi(*application).Run()
 }

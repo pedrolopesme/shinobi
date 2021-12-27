@@ -4,7 +4,15 @@
     },
     "stocks" : [
         {"symbol" : "MGLU3.SA"},
-        {"symbol" : "WEGE3.SA"}
+        {"symbol" : "VSPT3.SA"},
+        {"symbol" : "VSPT4.SA"},
+        {"symbol" : "TXRX3.SA"},
+        {"symbol" : "SNSY3.SA"},
+        {"symbol" : "TKNO3.SA"},
+        {"symbol" : "TKNO4.SA"},
+        {"symbol" : "SMFT3.SA"},
+        {"symbol" : "STTR3.SA"},
+        {"symbol" : "STKF3.SA"}
     ],
     "report": {
         "path" : "./reports",
