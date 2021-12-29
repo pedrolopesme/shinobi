@@ -1,7 +1,4 @@
 {
-    "alphavantage": {
-        "api_key": "INSERT YOUR KEY HERE"
-    },
     "stocks" : [
         {"symbol" : "MGLU3.SA"},
         {"symbol" : "VSPT3.SA"},

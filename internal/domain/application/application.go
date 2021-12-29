@@ -11,9 +11,8 @@ import (
 )
 
 const (
-	CTX_APP          = "CTX_Application"
-	CTX_ALPHAVANTAGE = "CTX_ALPHAVANTAGE"
-	CTX_LOGGER       = "CTX_LOGGER"
+	CTX_APP    = "CTX_Application"
+	CTX_LOGGER = "CTX_LOGGER"
 )
 
 type Application struct {
@@ -31,7 +30,6 @@ func NewApplication(
 	}
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, CTX_ALPHAVANTAGE, appConfig.AlphaVantage.ApiKey)
 	ctx = context.WithValue(ctx, CTX_LOGGER, logger)
 
 	return &Application{
@@ -55,10 +53,6 @@ func loadConfigFile(path string) (*Config, error) {
 
 func (a Application) Logger() zap.Logger {
 	return a.ctx.Value(CTX_LOGGER).(zap.Logger)
-}
-
-func (a Application) AlphaVantageKey() string {
-	return a.ctx.Value(CTX_ALPHAVANTAGE).(string)
 }
 
 func (a Application) Stocks() []domain.Stock {
