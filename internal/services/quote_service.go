@@ -7,20 +7,20 @@ import (
 	"go.uber.org/zap"
 )
 
-type AlphaVantageQuoteService struct {
+type QuoteService struct {
 	application application.Application
 	repositoy   ports.QuotesRepositoryContract
 }
 
-func NewAlphaVantageQuoteService(application application.Application, repo ports.QuotesRepositoryContract) AlphaVantageQuoteService {
-	return AlphaVantageQuoteService{
+func NewQuoteService(application application.Application, repo ports.QuotesRepositoryContract) QuoteService {
+	return QuoteService{
 		application: application,
 		repositoy:   repo,
 	}
 }
 
 // GetQuotes returns the quotes from a given symbol
-func (s AlphaVantageQuoteService) GetQuotes(symbol string) ([]domain.Quote, error) {
+func (s QuoteService) GetQuotes(symbol string) ([]domain.Quote, error) {
 	// retrieving logger from application context
 	logger := s.application.Logger()
 

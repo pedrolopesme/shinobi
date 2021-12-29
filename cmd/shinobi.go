@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"github.com/pedrolopesme/shinobi/internal/domain/application"
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	MAX_CONCURRENT_WORKERS = 1
+	MAX_CONCURRENT_WORKERS = 5
 )
 
 type Shinobi struct {
@@ -70,10 +71,11 @@ func (s Shinobi) syncStock(stock domain.Stock) *domain.ReportStock {
 	logger := s.application.Logger()
 	logger.Info("Running Shinobi on " + stock.Symbol)
 
-	quotesRepo := quotes.NewAlphaVantageQuoteRepository(s.application)
-	quotesService := services.NewAlphaVantageQuoteService(s.application, quotesRepo)
+	quotesRepo := quotes.NewYahooQuotesRepository(s.application)
+	quotesService := services.NewQuoteService(s.application, quotesRepo)
 
 	logger.Info("Getting quotes")
+	time.Sleep(time.Duration(time.Second * 2))
 	quotes, err := quotesService.GetQuotes(stock.Symbol)
 	if err != nil {
 		logger.Error("impossible to calculate moving average", zap.String("symbol", stock.Symbol), zap.Error(err))

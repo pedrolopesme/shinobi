@@ -1,8 +1,10 @@
 package domain
 
+import "github.com/shopspring/decimal"
+
 type Period struct {
 	Name  int
-	Value float32
+	Value decimal.Decimal
 }
 
 type ReportStock struct {

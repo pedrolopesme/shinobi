@@ -8,7 +8,8 @@ import (
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"github.com/pedrolopesme/shinobi/internal/domain/application"
-	"github.com/pedrolopesme/shinobi/internal/utils"
+	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 )
 
 type ReportService struct {
@@ -30,8 +31,13 @@ func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Q
 		Periods: make([]domain.Period, 0),
 	}
 
+	if len(quotes) == 0 {
+		logger.Warn("No quotes fond", zap.String("stock", stock.Symbol))
+		return &report, nil
+	}
+
 	for i := range periods {
-		movingAgerage, err := r.calculateMovingAveragePeriod(quotes, periods[i])
+		movingAgerage, err := r.calculateMovingAveragePeriod(stock.Symbol, quotes, periods[i])
 		if err != nil {
 			logger.Error(err.Error())
 			return nil, err
@@ -59,7 +65,7 @@ func (r ReportService) SaveReport(report domain.Report) error {
 		reportStock := report.Stocks[i]
 		fileContent += fmt.Sprintf("%s;", reportStock.Stock.Symbol)
 		for i := range reportStock.Periods {
-			fileContent += fmt.Sprintf("%f;", reportStock.Periods[i].Value)
+			fileContent += fmt.Sprintf("%s;", reportStock.Periods[i].Value.StringFixed(2))
 		}
 		fileContent = fileContent[:len(fileContent)-1] + "\n"
 	}
@@ -71,15 +77,14 @@ func (r ReportService) SaveReport(report domain.Report) error {
 	return nil
 }
 
-func (r ReportService) calculateMovingAveragePeriod(quotes []domain.Quote, period int) (float32, error) {
+func (r ReportService) calculateMovingAveragePeriod(s string, quotes []domain.Quote, period int) (decimal.Decimal, error) {
 	// calculating the simple moving average for the selected period
-	result := float32(0)
+	result := decimal.NewFromInt(0)
 	period = int(math.Min(float64(period), float64(len(quotes)))) // :-(
 
 	for i := 0; i < period; i++ {
-		result += quotes[i].Close
+		result = result.Add(quotes[i].Close)
 	}
 
-	result /= float32(period)
-	return utils.RoundMoney(result)
+	return result.Div(decimal.NewFromInt(int64(period))), nil
 }
