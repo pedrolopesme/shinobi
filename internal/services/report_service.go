@@ -54,18 +54,18 @@ func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Q
 
 func (r ReportService) SaveReport(report domain.Report) error {
 	// preparing header
-	fileContent := "symbol;"
+	fileContent := "symbol,"
 	for i := range r.application.Periods() {
-		fileContent += fmt.Sprintf("D%d;", r.application.Periods()[i])
+		fileContent += fmt.Sprintf("D%d,", r.application.Periods()[i])
 	}
 	fileContent = fileContent[:len(fileContent)-1] + "\n"
 
 	// preparing content
 	for i := range report.Stocks {
 		reportStock := report.Stocks[i]
-		fileContent += fmt.Sprintf("%s;", reportStock.Stock.Symbol)
+		fileContent += fmt.Sprintf("%s,", reportStock.Stock.Symbol)
 		for i := range reportStock.Periods {
-			fileContent += fmt.Sprintf("%s;", reportStock.Periods[i].Value.StringFixed(2))
+			fileContent += fmt.Sprintf("%s,", reportStock.Periods[i].Value.StringFixed(2))
 		}
 		fileContent = fileContent[:len(fileContent)-1] + "\n"
 	}

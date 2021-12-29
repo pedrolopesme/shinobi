@@ -1,2 +1,3 @@
 config/tests*
 reports/report_*
+.DS_Store
