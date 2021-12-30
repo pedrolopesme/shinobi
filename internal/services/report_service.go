@@ -33,6 +33,10 @@ func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Q
 	logger := r.application.Logger()
 	periods := r.application.Periods()
 
+	if len(quotes) == 0 {
+		return nil, errors.New("No quotes found")
+	}
+
 	report := domain.ReportStock{
 		Stock:     stock,
 		BaseValue: quotes[0].Close,

@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-	"time"
 
 	"github.com/pedrolopesme/shinobi/internal/domain"
 	"github.com/pedrolopesme/shinobi/internal/domain/application"
@@ -75,11 +73,9 @@ func (s Shinobi) syncStock(stock domain.Stock) *domain.ReportStock {
 	quotesService := services.NewQuoteService(s.application, quotesRepo)
 
 	logger.Info("Getting quotes")
-	time.Sleep(time.Duration(time.Second * 2))
 	quotes, err := quotesService.GetQuotes(stock.Symbol)
 	if err != nil {
 		logger.Error("impossible to calculate moving average", zap.String("symbol", stock.Symbol), zap.Error(err))
-		os.Exit(1)
 	}
 
 	report, err := s.reportService.GenerateReportStock(stock, quotes)
