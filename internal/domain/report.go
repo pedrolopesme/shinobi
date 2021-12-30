@@ -3,13 +3,16 @@ package domain
 import "github.com/shopspring/decimal"
 
 type Period struct {
-	Name  int
-	Value decimal.Decimal
+	Name      int
+	Value     decimal.Decimal
+	Evolution decimal.Decimal
 }
 
 type ReportStock struct {
-	Stock   Stock
-	Periods []Period
+	Stock     Stock
+	BaseValue decimal.Decimal
+	Periods   []Period
+	Trend     string
 }
 
 type Report struct {

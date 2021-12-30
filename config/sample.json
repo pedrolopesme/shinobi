@@ -1,15 +1,13 @@
 {
     "stocks" : [
-        {"symbol" : "MGLU3.SA"},
-        {"symbol" : "VSPT3.SA"},
-        {"symbol" : "VSPT4.SA"},
-        {"symbol" : "TXRX3.SA"},
-        {"symbol" : "SNSY3.SA"},
-        {"symbol" : "TKNO3.SA"},
-        {"symbol" : "TKNO4.SA"},
-        {"symbol" : "SMFT3.SA"},
-        {"symbol" : "STTR3.SA"},
-        {"symbol" : "STKF3.SA"}
+        {"symbol" : "VSPT3.SA","compay":"FER C ATLANT", "sector":"Bens Industriais", "subsector":"Transporte", "segment":"Transporte Ferroviário"},
+        {"symbol" : "VSPT4.SA","compay":"FER C ATLANT", "sector":"Bens Industriais", "subsector":"Transporte", "segment":"Transporte Ferroviário"},
+        {"symbol" : "TXRX3.SA","compay":"TEX RENAUX", "sector":"Consumo Cíclico", "subsector":"Tecidos, Vestuário e Calçados", "segment":"Fios e Tecidos"},
+        {"symbol" : "SNSY3.SA","compay":"SANSUY", "sector":"Materiais Básicos", "subsector":"Materiais Diversos", "segment":"Materiais Diversos"},
+        {"symbol" : "TKNO3.SA","compay":"TEKNO", "sector":"Materiais Básicos", "subsector":"Siderurgia e Metalurgia", "segment":"Artefatos de Ferro e Aço"},
+        {"symbol" : "TKNO4.SA","compay":"TEKNO", "sector":"Materiais Básicos", "subsector":"Siderurgia e Metalurgia", "segment":"Artefatos de Ferro e Aço"},
+        {"symbol" : "FHER3.SA","compay":"FER HERINGER", "sector":"Materiais Básicos", "subsector":"Químicos", "segment":"Fertilizantes e Defensivos"},
+        {"symbol" : "DASA3.SA","compay":"DASA", "sector":"Saúde", "subsector":"Análises e Diagnósticos", "segment":"Análises e Diagnósticos"}
     ],
     "report": {
         "path" : "./reports",
