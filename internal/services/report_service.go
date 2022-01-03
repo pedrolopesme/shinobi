@@ -78,7 +78,7 @@ func (r ReportService) SaveReport(report domain.Report) error {
 	for i := range report.Stocks {
 		reportStock := report.Stocks[i]
 
-		if len(reportStock.Periods) != len(r.application.Periods()) {
+		if reportStock.IsEmpty() {
 			continue
 		}
 

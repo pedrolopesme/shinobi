@@ -61,6 +61,8 @@ func (s Shinobi) syncWorker(stocks <-chan domain.Stock, results chan<- domain.Re
 		logger.Info("Synching stock " + stock.Symbol)
 		if reportStock := s.syncStock(stock); reportStock != nil {
 			results <- *reportStock
+		} else {
+			results <- domain.ReportStock{}
 		}
 	}
 }

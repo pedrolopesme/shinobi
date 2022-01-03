@@ -26,3 +26,7 @@ func (r *Report) AddStock(reportStock ReportStock) {
 
 	r.Stocks = append(r.Stocks, reportStock)
 }
+
+func (rs ReportStock) IsEmpty() bool {
+	return rs.Stock.Symbol == "" || len(rs.Periods) == 0
+}
