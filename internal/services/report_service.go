@@ -56,9 +56,8 @@ func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Q
 		}
 
 		report.Periods = append(report.Periods, domain.Period{
-			Name:      periods[i],
-			Value:     movingAgerage,
-			Evolution: r.calculateEvolution(report.BaseValue, movingAgerage),
+			Name:  periods[i],
+			Value: movingAgerage,
 		})
 	}
 
@@ -70,7 +69,6 @@ func (r ReportService) SaveReport(report domain.Report) error {
 	fileContent := "symbol,trend,"
 	for i := range r.application.Periods() {
 		fileContent += fmt.Sprintf("MA Period%d,", r.application.Periods()[i])
-		fileContent += fmt.Sprintf("Percent %d,", r.application.Periods()[i])
 	}
 	fileContent = fileContent[:len(fileContent)-1] + "\n"
 
@@ -87,7 +85,6 @@ func (r ReportService) SaveReport(report domain.Report) error {
 
 		for i := range reportStock.Periods {
 			fileContent += fmt.Sprintf("%s,", reportStock.Periods[i].Value.StringFixed(2))
-			fileContent += fmt.Sprintf("%s,", reportStock.Periods[i].Evolution.StringFixed(2))
 		}
 		fileContent = fileContent[:len(fileContent)-1] + "\n"
 	}
@@ -109,13 +106,6 @@ func (r ReportService) calculateMovingAveragePeriod(s string, quotes []domain.Qu
 	}
 
 	return result.Div(decimal.NewFromInt(int64(period))), nil
-}
-
-func (r ReportService) calculateEvolution(baseValue, newValue decimal.Decimal) decimal.Decimal {
-	if baseValue.Equals(decimal.Decimal{}) {
-		return decimal.Decimal{}
-	}
-	return baseValue.Sub(newValue).Div(baseValue).Mul(decimal.NewFromInt(100))
 }
 
 func (r ReportService) identifyTrend(reportStock domain.ReportStock) string {

@@ -1,2 +1,2 @@
 run:
-	@go run main.go --config=config/tests.json
+	@go run main.go --config=config/sample.json
