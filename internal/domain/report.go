@@ -8,10 +8,11 @@ type Period struct {
 }
 
 type ReportStock struct {
-	Stock     Stock
-	BaseValue decimal.Decimal
-	Periods   []Period
-	Trend     string
+	Stock          Stock
+	BaseValue      decimal.Decimal
+	Periods        []Period
+	Trend          string
+	RecentVolumeMA int32
 }
 
 type Report struct {

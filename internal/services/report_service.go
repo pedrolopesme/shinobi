@@ -17,6 +17,8 @@ const (
 	TREND_BULL    = "bull"
 	TREND_UNKNOWN = "unknown"
 	TREND_BEAR    = "bear"
+
+	DEAULT_VOLUME_MA_PERIOD = 10
 )
 
 type ReportService struct {
@@ -38,9 +40,10 @@ func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Q
 	}
 
 	report := domain.ReportStock{
-		Stock:     stock,
-		BaseValue: quotes[0].Close,
-		Periods:   make([]domain.Period, 0),
+		Stock:          stock,
+		BaseValue:      quotes[0].Close,
+		Periods:        make([]domain.Period, 0),
+		RecentVolumeMA: r.calculateVolumeMovingAverage(stock.Symbol, quotes, DEAULT_VOLUME_MA_PERIOD), // two work weeks
 	}
 
 	if len(quotes) == 0 {
@@ -49,7 +52,7 @@ func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Q
 	}
 
 	for i := range periods {
-		movingAgerage, err := r.calculateMovingAveragePeriod(stock.Symbol, quotes, periods[i])
+		movingAgerage, err := r.calculateClosePriceMovingAverage(stock.Symbol, quotes, periods[i])
 		if err != nil {
 			logger.Error(err.Error())
 			return nil, err
@@ -66,7 +69,7 @@ func (r ReportService) GenerateReportStock(stock domain.Stock, quotes []domain.Q
 
 func (r ReportService) SaveReport(report domain.Report) error {
 	// preparing header
-	fileContent := "symbol,trend,"
+	fileContent := "symbol,trend, MA Volume,"
 	for i := range r.application.Periods() {
 		fileContent += fmt.Sprintf("MA Period%d,", r.application.Periods()[i])
 	}
@@ -82,6 +85,7 @@ func (r ReportService) SaveReport(report domain.Report) error {
 
 		fileContent += fmt.Sprintf("%s,", reportStock.Stock.Symbol)
 		fileContent += fmt.Sprintf("%s,", r.identifyTrend(reportStock))
+		fileContent += fmt.Sprintf("%d,", reportStock.RecentVolumeMA)
 
 		for i := range reportStock.Periods {
 			fileContent += fmt.Sprintf("%s,", reportStock.Periods[i].Value.StringFixed(2))
@@ -96,7 +100,7 @@ func (r ReportService) SaveReport(report domain.Report) error {
 	return nil
 }
 
-func (r ReportService) calculateMovingAveragePeriod(s string, quotes []domain.Quote, period int) (decimal.Decimal, error) {
+func (r ReportService) calculateClosePriceMovingAverage(s string, quotes []domain.Quote, period int) (decimal.Decimal, error) {
 	// calculating the simple moving average for the selected period
 	result := decimal.NewFromInt(0)
 	period = int(math.Min(float64(period), float64(len(quotes)))) // :-(
@@ -106,6 +110,18 @@ func (r ReportService) calculateMovingAveragePeriod(s string, quotes []domain.Qu
 	}
 
 	return result.Div(decimal.NewFromInt(int64(period))), nil
+}
+
+func (r ReportService) calculateVolumeMovingAverage(s string, quotes []domain.Quote, period int) int32 {
+	// calculating the simple moving average for the selected period
+	result := int32(0)
+	period = int(math.Min(float64(period), float64(len(quotes)))) // :-(
+
+	for i := 0; i < period; i++ {
+		result += quotes[i].Volume
+	}
+
+	return result / int32(period)
 }
 
 func (r ReportService) identifyTrend(reportStock domain.ReportStock) string {
